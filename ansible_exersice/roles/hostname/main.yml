@@ -1,0 +1,5 @@
+
+---
+- name: Update the hostname using the Name tag from ec2_tags
+  ansible.builtin.hostname:
+    name: "{{ ec2_tags.Name }}"

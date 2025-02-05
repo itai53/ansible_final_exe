@@ -1,0 +1,55 @@
+---
+- name: Getting tags and sending them to all.yml
+  hosts: itai_my_ec2
+  gather_facts: true
+  tasks:
+    - name: Getting EC2 metadata
+      amazon.aws.ec2_metadata_facts:
+      register: ec2_metadata
+
+    - name: Get Name tag
+      set_fact:
+        Name: "{{ hostvars[inventory_hostname]['tags'].get('Name', 'default-host') }}"
+
+    - name: Get Service tag
+      set_fact:
+        Service: "{{ hostvars[inventory_hostname]['tags'].get('Service', 'default-service') }}"
+
+    - name: Get Version tag
+      set_fact:
+        Version: "{{ hostvars[inventory_hostname]['tags'].get('Version', 'latest') }}"
+
+    - name: Get Restart tag
+      set_fact:
+        Restart: "{{ hostvars[inventory_hostname]['tags'].get('Restart', 'default-restart') }}"
+
+    - name: Create a list of tags
+      set_fact:
+        ec2_tags:
+          Name: "{{ Name }}"
+          Service: "{{ Service }}"
+          Version: "{{ Version }}"
+          Restart: "{{ Restart }}"
+
+    - name: Sending list of tags to group_vars/all.yml
+      copy:
+        dest: "/home/ec2-user/ansible_exersice/group_vars/all.yml"
+        content: |
+          ec2_tags:
+            Name: "{{ ec2_tags.Name }}"
+            Service: "{{ ec2_tags.Service }}"
+            Version: "{{ ec2_tags.Version }}"
+            Restart: "{{ ec2_tags.Restart }}"
+      delegate_to: localhost
+
+    - name: Update the hostname of the server based on the name tag.
+      include_role:
+        name: hostname
+
+    - name: Install the service configured in the service tag.
+      include_role:
+        name: service
+
+    - name: Create a crontab record for restarting the server based on the Restart tag
+      include_role:
+        name: restart

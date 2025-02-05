@@ -1,0 +1,16 @@
+plugin: aws_ec2
+
+aws_access_key: 
+aws_secret_key: 
+regions:
+  -
+filters:
+  tag:Managed: 'true'
+  tag:owner: 'itaimoshe'
+  
+compose:
+  ansible_host: public_ip_address
+  ansible_user: ec2-user
+groups:
+  itai_my_ec2:
+    - "'itaimoshe' in tags.owner and 'true' in tags.Managed"

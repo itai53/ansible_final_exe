@@ -1,0 +1,5 @@
+ec2_tags:
+  Name: "itai_mysql-test-aws-01"
+  Service: "default-service"
+  Version: "5.7"
+  Restart: "Sunday at 6:00 am"

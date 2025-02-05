@@ -1,0 +1,6 @@
+---
+- name: Seting cron job 
+  ansible.builtin.cron:
+    name: "Restart server"
+    minute: "0"
+   
